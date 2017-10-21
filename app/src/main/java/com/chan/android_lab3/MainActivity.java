@@ -1,10 +1,13 @@
 package com.chan.android_lab3;
 
+import android.content.DialogInterface;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
 
@@ -21,14 +24,33 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        final AlertDialog.Builder alertdialog = new AlertDialog.Builder(this);
+        alertdialog.setTitle("移除商品")
+                    .setNegativeButton("取消", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                        }
+                    });
         initShoppingList();
-        ListView shoppingListView = (ListView) findViewById(R.id.shoppinglist);
-        SimpleAdapter simpleAdapter = new SimpleAdapter(this, ShoppingList,R.layout.shoppinglist_layout,new String[]{"abbr","name", "price"},new int[]{R.id.abbr,R.id.name,R.id.price});
+        final ListView shoppingListView = (ListView) findViewById(R.id.shoppinglist);
+        final SimpleAdapter simpleAdapter = new SimpleAdapter(this, ShoppingList,R.layout.shoppinglist_layout,new String[]{"abbr","name", "price"},new int[]{R.id.abbr,R.id.name,R.id.price});
         shoppingListView.setAdapter(simpleAdapter);
-        shoppingListView.setOnLongClickListener(new View.OnLongClickListener() {
+        shoppingListView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
-            public boolean onLongClick(View v) {
-                
+            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+                final int pos= position;
+                if(pos != 0)
+                {
+                    alertdialog.setPositiveButton("确认", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            ShoppingList.remove(pos);
+                            simpleAdapter.notifyDataSetChanged();
+                        }
+                    }).setMessage("从购物车移除"+ShoppingList.get(pos).get("name")+"?")
+                            .create()
+                            .show();
+                }
                 return false;
             }
         });
