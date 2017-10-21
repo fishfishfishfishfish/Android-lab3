@@ -1,6 +1,7 @@
 package com.chan.android_lab3;
 
 import android.content.DialogInterface;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -10,6 +11,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
+import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -18,20 +20,23 @@ import java.util.Map;
 
 public class MainActivity extends AppCompatActivity {
     List<Map<String, Object>> ShoppingList = new ArrayList<>();
+    List<Map<String, Object>> GoodsList = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        final AlertDialog.Builder alertdialog = new AlertDialog.Builder(this);
-        alertdialog.setTitle("移除商品")
+        //购物车的对话框
+        final AlertDialog.Builder shoppinglist_alertdialog = new AlertDialog.Builder(this);
+        shoppinglist_alertdialog.setTitle("移除商品")
                     .setNegativeButton("取消", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
                         }
                     });
-        initShoppingList();
+        //购物车，使用ListView和SimpleAdapter
+        initShoppingList();//初始化购物车需要的List
         final ListView shoppingListView = (ListView) findViewById(R.id.shoppinglist);
         final SimpleAdapter simpleAdapter = new SimpleAdapter(this, ShoppingList,R.layout.shoppinglist_layout,new String[]{"abbr","name", "price"},new int[]{R.id.abbr,R.id.name,R.id.price});
         shoppingListView.setAdapter(simpleAdapter);
@@ -41,7 +46,7 @@ public class MainActivity extends AppCompatActivity {
                 final int pos= position;
                 if(pos != 0)
                 {
-                    alertdialog.setPositiveButton("确认", new DialogInterface.OnClickListener() {
+                    shoppinglist_alertdialog.setPositiveButton("确认", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
                             ShoppingList.remove(pos);
@@ -54,8 +59,44 @@ public class MainActivity extends AppCompatActivity {
                 return false;
             }
         });
-    }
 
+        initGoodsList();//初始化商品列表
+        final RecyclerView goodsRecyclerView = (RecyclerView) findViewById(R.id.recycler_view);
+        goodsRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+        //商品列表的Adapter
+        final CommonAdapter goodslistAdapter = new CommonAdapter(this, R.layout.item, GoodsList)
+        {
+            @Override
+            public void convert(ViewHolder holder, Map<String, Object> s) {
+                TextView name = holder.getView(R.id.name);
+                name.setText(s.get("name").toString());
+                TextView abbr = holder.getView(R.id.abbr);
+                abbr.setText(s.get("abbr").toString());
+            }
+        };
+        goodsRecyclerView.setAdapter(goodslistAdapter);
+
+        final FloatingActionButton SwitchBtn = (FloatingActionButton)findViewById(R.id.switch_button);
+        SwitchBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(goodsRecyclerView.getVisibility() == View.VISIBLE)
+                {
+                    goodsRecyclerView.setVisibility(View.GONE);
+                    shoppingListView.setVisibility(View.VISIBLE);
+                    SwitchBtn.setBackgroundResource(R.drawable.mainpage);
+                }
+                else if(shoppingListView.getVisibility() == View.VISIBLE)
+                {
+                    goodsRecyclerView.setVisibility(View.VISIBLE);
+                    shoppingListView.setVisibility(View.GONE);
+                    SwitchBtn.setBackgroundResource(R.drawable.shoplist);
+                }
+            }
+        });
+    }//end OnCreate
+
+    //购物车需要的List在此初始化
     private void initShoppingList()
     {
         String[] goodName = new String[]{"购物车","Enchated Forest", "Arla Milk", "Devondale Milk", "Kindle Oasis", "waitrose 早餐麦片",
@@ -74,6 +115,19 @@ public class MainActivity extends AppCompatActivity {
             temp1.put("name", goodName[i]);
             temp1.put("price", goodPrice[i]);
             ShoppingList.add(temp1);
+        }
+    }
+    //商品列表在此初始化
+    private void initGoodsList()
+    {
+        String[] goodName = new String[]{"购物车","Enchated Forest", "Arla Milk", "Devondale Milk", "Kindle Oasis", "waitrose 早餐麦片",
+                "Mcvitie's 饼干", "Ferrero Rocher","Maltesers","Lindt","Borggreve"};
+        for(int i = 1; i < 10; i++)
+        {
+            Map<String, Object> temp = new LinkedHashMap<>();
+            temp.put("abbr", goodName[i].substring(0,1));
+            temp.put("name", goodName[i]);
+            GoodsList.add(temp);
         }
     }
 
