@@ -18,6 +18,10 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import jp.wasabeef.recyclerview.adapters.ScaleInAnimationAdapter;
+import jp.wasabeef.recyclerview.animators.OvershootInLeftAnimator;
+import jp.wasabeef.recyclerview.animators.SlideInLeftAnimator;
+
 public class MainActivity extends AppCompatActivity {
     List<Map<String, Object>> ShoppingList = new ArrayList<>();
     List<Map<String, Object>> GoodsList = new ArrayList<>();
@@ -74,7 +78,25 @@ public class MainActivity extends AppCompatActivity {
                 abbr.setText(s.get("abbr").toString());
             }
         };
-        goodsRecyclerView.setAdapter(goodslistAdapter);
+
+        final ScaleInAnimationAdapter animationAdapter = new ScaleInAnimationAdapter(goodslistAdapter);
+        animationAdapter.setDuration(1000);
+        goodsRecyclerView.setAdapter(animationAdapter);
+        goodsRecyclerView.setItemAnimator(new OvershootInLeftAnimator(1f));
+        goodsRecyclerView.setItemAnimator(new SlideInLeftAnimator());
+        goodslistAdapter.setmOnItemClickListener(new CommonAdapter.OnItemClickListener() {
+            @Override
+            public void onClick(int position) {
+
+            }
+
+            @Override
+            public void onLongClick(int position) {
+                GoodsList.remove(position);
+                goodslistAdapter.notifyItemChanged(position);
+            }
+        });
+
 
         final FloatingActionButton SwitchBtn = (FloatingActionButton)findViewById(R.id.switch_button);
         SwitchBtn.setOnClickListener(new View.OnClickListener() {
@@ -84,13 +106,13 @@ public class MainActivity extends AppCompatActivity {
                 {
                     goodsRecyclerView.setVisibility(View.GONE);
                     shoppingListView.setVisibility(View.VISIBLE);
-                    SwitchBtn.setBackgroundResource(R.drawable.mainpage);
+                    SwitchBtn.setImageResource(R.drawable.mainpage);
                 }
                 else if(shoppingListView.getVisibility() == View.VISIBLE)
                 {
                     goodsRecyclerView.setVisibility(View.VISIBLE);
                     shoppingListView.setVisibility(View.GONE);
-                    SwitchBtn.setBackgroundResource(R.drawable.shoplist);
+                    SwitchBtn.setImageResource(R.drawable.shoplist);//如何设置图片为background?
                 }
             }
         });
