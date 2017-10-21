@@ -15,10 +15,13 @@ import android.view.ViewGroup;
 public class ViewHolder extends RecyclerView.ViewHolder{
     private SparseArray<View> mViews;//存储list的子view
     private View mConvertView;//存储
+    private  Context mContext;
+
     public ViewHolder(Context context, View itemView, ViewGroup parent) {
         super(itemView);
         mConvertView = itemView;
         mViews = new SparseArray<View>();
+        mContext = context;
     }
     public static ViewHolder get(Context context, ViewGroup parent, int layoutId)
     {
