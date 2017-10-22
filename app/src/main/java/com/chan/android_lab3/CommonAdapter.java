@@ -23,7 +23,7 @@ public abstract class CommonAdapter extends RecyclerView.Adapter<ViewHolder> {
     protected int mLayoutId;
     protected List<Map<String, Object>> mDatas;
     protected LayoutInflater mInflater;
-    private AdapterView.OnItemClickListener mOnItemClickListener = null;
+    private OnItemClickListener mOnItemClickListener = null;
 
     public CommonAdapter(Context context, int layout, List<Map<String, Object>> datas){
         mContext = context;
@@ -42,9 +42,35 @@ public abstract class CommonAdapter extends RecyclerView.Adapter<ViewHolder> {
     public void onBindViewHolder(final ViewHolder holder, int position)
     {
         convert(holder, mDatas.get(position));
+        if(mOnItemClickListener != null){
+            holder.itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    mOnItemClickListener.onClick(holder.getAdapterPosition());
+                }
+            });
+            holder.itemView.setOnLongClickListener(new View.OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View view) {
+                    mOnItemClickListener.onLongClick(holder.getAdapterPosition());
+                    return false;
+                }
+            });
+        }
     }
     @Override
     public int getItemCount(){ return mDatas.size(); }
 
     public abstract void convert(ViewHolder holder, Map<String, Object> s);
+
+    public interface OnItemClickListener
+
+    {
+        void onClick(int position);
+        void onLongClick(int position);
+    }
+
+    public void setOnItemClickListener(OnItemClickListener onItemClickListener){
+        this.mOnItemClickListener=onItemClickListener;
+    }
 }

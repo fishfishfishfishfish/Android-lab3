@@ -1,6 +1,7 @@
 package com.chan.android_lab3;
 
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -12,12 +13,14 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import jp.wasabeef.recyclerview.adapters.AlphaInAnimationAdapter;
 import jp.wasabeef.recyclerview.adapters.ScaleInAnimationAdapter;
 import jp.wasabeef.recyclerview.animators.OvershootInLeftAnimator;
 import jp.wasabeef.recyclerview.animators.SlideInLeftAnimator;
@@ -25,6 +28,7 @@ import jp.wasabeef.recyclerview.animators.SlideInLeftAnimator;
 public class MainActivity extends AppCompatActivity {
     List<Map<String, Object>> ShoppingList = new ArrayList<>();
     List<Map<String, Object>> GoodsList = new ArrayList<>();
+    SimpleAdapter simpleAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,7 +46,7 @@ public class MainActivity extends AppCompatActivity {
         //购物车，使用ListView和SimpleAdapter
         initShoppingList();//初始化购物车需要的List
         final ListView shoppingListView = (ListView) findViewById(R.id.shoppinglist);
-        final SimpleAdapter simpleAdapter = new SimpleAdapter(this, ShoppingList,R.layout.shoppinglist_layout,new String[]{"abbr","name", "price"},new int[]{R.id.abbr,R.id.name,R.id.price});
+        simpleAdapter = new SimpleAdapter(this, ShoppingList,R.layout.shoppinglist_layout,new String[]{"abbr","name", "price"},new int[]{R.id.abbr,R.id.name,R.id.price});
         shoppingListView.setAdapter(simpleAdapter);
         shoppingListView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
@@ -63,6 +67,17 @@ public class MainActivity extends AppCompatActivity {
                 return false;
             }
         });
+        shoppingListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                if(i != 0) {
+                    String chose_name = ShoppingList.get(i).get("name").toString();
+                    Intent intent = new Intent(MainActivity.this, detail.class);
+                    intent.putExtra("goodsName", chose_name);
+                    startActivityForResult(intent, 1);
+                }
+            }
+        });
 
         initGoodsList();//初始化商品列表
         final RecyclerView goodsRecyclerView = (RecyclerView) findViewById(R.id.recycler_view);
@@ -79,21 +94,26 @@ public class MainActivity extends AppCompatActivity {
             }
         };
 
-        final ScaleInAnimationAdapter animationAdapter = new ScaleInAnimationAdapter(goodslistAdapter);
+//        goodsRecyclerView.setAdapter(goodslistAdapter);
+        ScaleInAnimationAdapter animationAdapter = new ScaleInAnimationAdapter(goodslistAdapter);
         animationAdapter.setDuration(1000);
         goodsRecyclerView.setAdapter(animationAdapter);
-        goodsRecyclerView.setItemAnimator(new OvershootInLeftAnimator(1f));
-        goodsRecyclerView.setItemAnimator(new SlideInLeftAnimator());
-        goodslistAdapter.setmOnItemClickListener(new CommonAdapter.OnItemClickListener() {
+        goodsRecyclerView.setItemAnimator(new OvershootInLeftAnimator());
+        goodslistAdapter.setOnItemClickListener(new CommonAdapter.OnItemClickListener() {
             @Override
             public void onClick(int position) {
-
+                String chose_name = GoodsList.get(position).get("name").toString();
+                Intent intent = new Intent(MainActivity.this, detail.class);
+                intent.putExtra("goodsName", chose_name);
+                startActivityForResult(intent,1);
             }
 
             @Override
             public void onLongClick(int position) {
+                String index = Integer.toString(position);
                 GoodsList.remove(position);
-                goodslistAdapter.notifyItemChanged(position);
+                goodslistAdapter.notifyItemRemoved(position);
+                Toast.makeText(MainActivity.this,"移除第"+index+"个商品",Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -118,33 +138,45 @@ public class MainActivity extends AppCompatActivity {
         });
     }//end OnCreate
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data)
+    {
+        if(requestCode == 1)
+        {
+            if(resultCode == RESULT_OK)
+            {
+                String rev_name = data.getStringExtra("name");
+                String rev_price = data.getStringExtra("price");
+                if(rev_name != null && rev_price != null)
+                {
+                    Map<String,Object> temp = new LinkedHashMap<>();
+                    temp.put("abbr", rev_name.substring(0,1));
+                    temp.put("name", rev_name);
+                    temp.put("price", rev_price);
+                    ShoppingList.add(temp);
+                    simpleAdapter.notifyDataSetChanged();
+                }
+            }
+        }
+
+    }
     //购物车需要的List在此初始化
     private void initShoppingList()
     {
-        String[] goodName = new String[]{"购物车","Enchated Forest", "Arla Milk", "Devondale Milk", "Kindle Oasis", "waitrose 早餐麦片",
-                                            "Mcvitie's 饼干", "Ferrero Rocher","Maltesers","Lindt","Borggreve"};
-        String[] goodPrice = new String[]{"价格","¥ 5.00", "¥ 59.00", "¥ 79.00", "¥ 2399.00", "¥ 179.00",
-                "¥ 14.90", "¥ 132.59","¥ 141.43","¥ 139.43","¥ 28.90"};
+        String[] goodName = new String[]{"购物车"};
+        String[] goodPrice = new String[]{"价格"};
         Map<String, Object> temp0 = new LinkedHashMap<>();
         temp0.put("abbr", "*");
         temp0.put("name", goodName[0]);
         temp0.put("price", goodPrice[0]);
         ShoppingList.add(temp0);
-        for(int i = 1; i < 10; i++)
-        {
-            Map<String, Object> temp1 = new LinkedHashMap<>();
-            temp1.put("abbr", goodName[i].substring(0,1));
-            temp1.put("name", goodName[i]);
-            temp1.put("price", goodPrice[i]);
-            ShoppingList.add(temp1);
-        }
     }
     //商品列表在此初始化
     private void initGoodsList()
     {
-        String[] goodName = new String[]{"购物车","Enchated Forest", "Arla Milk", "Devondale Milk", "Kindle Oasis", "waitrose 早餐麦片",
+        String[] goodName = new String[]{"Enchated Forest", "Arla Milk", "Devondale Milk", "Kindle Oasis", "waitrose 早餐麦片",
                 "Mcvitie's 饼干", "Ferrero Rocher","Maltesers","Lindt","Borggreve"};
-        for(int i = 1; i < 10; i++)
+        for(int i = 0; i < 10; i++)
         {
             Map<String, Object> temp = new LinkedHashMap<>();
             temp.put("abbr", goodName[i].substring(0,1));
