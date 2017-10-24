@@ -22,6 +22,8 @@ import java.util.Map;
 
 import jp.wasabeef.recyclerview.adapters.AlphaInAnimationAdapter;
 import jp.wasabeef.recyclerview.adapters.ScaleInAnimationAdapter;
+import jp.wasabeef.recyclerview.adapters.SlideInBottomAnimationAdapter;
+import jp.wasabeef.recyclerview.animators.LandingAnimator;
 import jp.wasabeef.recyclerview.animators.OvershootInLeftAnimator;
 import jp.wasabeef.recyclerview.animators.SlideInLeftAnimator;
 
@@ -95,10 +97,11 @@ public class MainActivity extends AppCompatActivity {
         };
 
 //        goodsRecyclerView.setAdapter(goodslistAdapter);
-        ScaleInAnimationAdapter animationAdapter = new ScaleInAnimationAdapter(goodslistAdapter);
+//        ScaleInAnimationAdapter animationAdapter = new ScaleInAnimationAdapter(goodslistAdapter);
+        AlphaInAnimationAdapter animationAdapter = new AlphaInAnimationAdapter(goodslistAdapter);
         animationAdapter.setDuration(1000);
         goodsRecyclerView.setAdapter(animationAdapter);
-        goodsRecyclerView.setItemAnimator(new OvershootInLeftAnimator());
+        goodsRecyclerView.setItemAnimator(new LandingAnimator());
         goodslistAdapter.setOnItemClickListener(new CommonAdapter.OnItemClickListener() {
             @Override
             public void onClick(int position) {
