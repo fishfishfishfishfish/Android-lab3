@@ -99,7 +99,7 @@ public class MainActivity extends AppCompatActivity {
 //        goodsRecyclerView.setAdapter(goodslistAdapter);
 //        ScaleInAnimationAdapter animationAdapter = new ScaleInAnimationAdapter(goodslistAdapter);
         AlphaInAnimationAdapter animationAdapter = new AlphaInAnimationAdapter(goodslistAdapter);
-        animationAdapter.setDuration(1000);
+        animationAdapter.setDuration(500);
         goodsRecyclerView.setAdapter(animationAdapter);
         goodsRecyclerView.setItemAnimator(new LandingAnimator());
         goodslistAdapter.setOnItemClickListener(new CommonAdapter.OnItemClickListener() {
@@ -151,14 +151,19 @@ public class MainActivity extends AppCompatActivity {
             {
                 String rev_name = data.getStringExtra("name");
                 String rev_price = data.getStringExtra("price");
-                if(rev_name != null && rev_price != null)
+                String rev_count = data.getStringExtra("count");
+                if(rev_name != null && rev_price != null && rev_count != "0")
                 {
-                    Map<String,Object> temp = new LinkedHashMap<>();
-                    temp.put("abbr", rev_name.substring(0,1));
-                    temp.put("name", rev_name);
-                    temp.put("price", rev_price);
-                    ShoppingList.add(temp);
-                    simpleAdapter.notifyDataSetChanged();
+                    int count = Integer.parseInt(rev_count);
+                    for(int i = 0; i < count; i++)
+                    {
+                        Map<String,Object> temp = new LinkedHashMap<>();
+                        temp.put("abbr", rev_name.substring(0,1));
+                        temp.put("name", rev_name);
+                        temp.put("price", rev_price);
+                        ShoppingList.add(temp);
+                        simpleAdapter.notifyDataSetChanged();
+                    }
                 }
             }
         }
