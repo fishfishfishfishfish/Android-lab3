@@ -42,8 +42,7 @@
         android:layout_height="wrap_content"
         android:layout_width="wrap_content"
         android:layout_alignParentRight="true"
-        android:layout_alignParentBottom="true"
-        android:layout_marginBottom="20dp"
+        android:layout_alignBottom="@+id/goods_name"
         android:layout_marginRight="20dp"
         android:src="@drawable/empty_star"
         android:background="#00000000"/>
