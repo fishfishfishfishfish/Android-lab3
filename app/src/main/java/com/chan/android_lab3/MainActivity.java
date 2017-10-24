@@ -64,7 +64,7 @@ public class MainActivity extends AppCompatActivity {
                             .create()
                             .show();
                 }
-                return false;
+                return true;
             }
         });
         shoppingListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -109,11 +109,12 @@ public class MainActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onLongClick(int position) {
+            public boolean onLongClick(int position) {
                 String index = Integer.toString(position);
                 GoodsList.remove(position);
                 goodslistAdapter.notifyItemRemoved(position);
                 Toast.makeText(MainActivity.this,"移除第"+index+"个商品",Toast.LENGTH_SHORT).show();
+                return true;
             }
         });
 

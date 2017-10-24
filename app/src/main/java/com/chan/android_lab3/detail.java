@@ -65,7 +65,7 @@ public class detail extends AppCompatActivity {
             public void onClick(View view) {
                 Intent intent = new Intent();
                 intent.putExtra("name",choiceName);
-                intent.putExtra("price", choiceName);
+                intent.putExtra("price", choicePrice);
                 setResult(RESULT_OK, intent);
                 finish();
             }

@@ -67,7 +67,7 @@ public abstract class CommonAdapter extends RecyclerView.Adapter<ViewHolder> {
 
     {
         void onClick(int position);
-        void onLongClick(int position);
+        boolean onLongClick(int position);
     }
 
     public void setOnItemClickListener(OnItemClickListener onItemClickListener){
